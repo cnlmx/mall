@@ -1,10 +1,13 @@
 <template>
   <div id="home">
+    <!-- 导航 -->
     <nav-bar class="home-nav">
       <template #center>购物街</template>
     </nav-bar>
+    <!-- 轮播图 -->
     <home-swiper :banners="banners" />
-    <home-recommend-view :recommends="recommends"></home-recommend-view>
+    <!-- 推荐信息 -->
+    <home-recommend-view :recommends="recommends" />
   </div>
 </template>
 
@@ -12,6 +15,7 @@
 import NavBar from 'components/common/navbar/NavBar'
 import HomeSwiper from './childComps/HomeSwiper'
 import HomeRecommendView from './childComps/HomeRecommendView'
+
 import { getHomeMultidata } from 'network/home.js'
 
 export default {
@@ -29,9 +33,9 @@ export default {
   },
   created () {
     // 请求多个数据
-    getHomeMultidata().then(res => {
-      this.banners = res.data.banner.list
-      this.recommends = res.data.recommend.list
+    getHomeMultidata().then(({ data }) => {
+      this.banners = data.data.banner.list
+      this.recommends = data.data.recommend.list
     })
   }
 }

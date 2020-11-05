@@ -1,16 +1,25 @@
 <template>
-    <div id="hy-swiper">
-      <div class="swiper" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
-        <slot></slot>
-      </div>
-      <slot name="indicator">
-      </slot>
-      <div class="indicator">
-        <slot name="indicator" v-if="showIndicator && slideCount>1">
-          <div v-for="(item, index) in slideCount" class="indi-item" :class="{active: index === currentIndex-1}" :key="index"></div>
-        </slot>
-      </div>
+  <div id="hy-swiper">
+    <div
+      class="swiper"
+      @touchstart="touchStart"
+      @touchmove="touchMove"
+      @touchend="touchEnd"
+    >
+      <slot></slot>
     </div>
+    <slot name="indicator"> </slot>
+    <div class="indicator">
+      <slot name="indicator" v-if="showIndicator && slideCount > 1">
+        <div
+          v-for="(item, index) in slideCount"
+          class="indi-item"
+          :class="{ active: index === currentIndex - 1 }"
+          :key="index"
+        ></div>
+      </slot>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -18,18 +27,22 @@ export default {
   name: 'Swiper',
   props: {
     interval: {
+      // 自动轮播时间
       type: Number,
       default: 3000
     },
     animDuration: {
+      // 延时滚动
       type: Number,
       default: 300
     },
     moveRatio: {
+      // 滚动距离，滚动 25% 时自动到下一张
       type: Number,
       default: 0.25
     },
     showIndicator: {
+      // 轮播图指示器是否显示：小圆点
       type: Boolean,
       default: true
     }
@@ -67,8 +80,8 @@ export default {
     },
 
     /**
-       * 滚动到正确的位置
-       */
+     * 滚动到正确的位置
+     */
     scrollContent: function (currentPosition) {
       // 0.设置正在滚动
       this.scrolling = true
@@ -85,8 +98,8 @@ export default {
     },
 
     /**
-       * 校验正确的位置
-       */
+     * 校验正确的位置
+     */
     checkPosition: function () {
       window.setTimeout(() => {
         // 1.校验正确的位置
@@ -105,17 +118,19 @@ export default {
     },
 
     /**
-       * 设置滚动的位置
-       */
+     * 设置滚动的位置
+     */
     setTransform: function (position) {
       this.swiperStyle.transform = `translate3d(${position}px, 0, 0)`
-      this.swiperStyle['-webkit-transform'] = `translate3d(${position}px), 0, 0`
+      this.swiperStyle[
+        '-webkit-transform'
+      ] = `translate3d(${position}px), 0, 0`
       this.swiperStyle['-ms-transform'] = `translate3d(${position}px), 0, 0`
     },
 
     /**
-       * 操作DOM, 在DOM前后添加Slide
-       */
+     * 操作DOM, 在DOM前后添加Slide
+     */
     handleDom: function () {
       // 1.获取要操作的元素
       const swiperEl = document.querySelector('.swiper')
@@ -139,8 +154,8 @@ export default {
     },
 
     /**
-       * 拖动事件的处理
-       */
+     * 拖动事件的处理
+     */
     touchStart: function (e) {
       // 1.如果正在滚动, 不可以拖动
       if (this.scrolling) return
@@ -170,9 +185,17 @@ export default {
       // 2.判断最终的距离
       if (this.distance === 0) {
         return
-      } else if (this.distance > 0 && currentMove > this.totalWidth * this.moveRatio) { // 右边移动超过0.5
+      } else if (
+        this.distance > 0 &&
+          currentMove > this.totalWidth * this.moveRatio
+      ) {
+        // 右边移动超过0.5
         this.currentIndex--
-      } else if (this.distance < 0 && currentMove > this.totalWidth * this.moveRatio) { // 向左移动超过0.5
+      } else if (
+        this.distance < 0 &&
+          currentMove > this.totalWidth * this.moveRatio
+      ) {
+        // 向左移动超过0.5
         this.currentIndex++
       }
 
@@ -184,8 +207,8 @@ export default {
     },
 
     /**
-       * 控制上一个, 下一个
-       */
+     * 控制上一个, 下一个
+     */
     previous: function () {
       this.changeItem(-1)
     },
@@ -240,6 +263,6 @@ export default {
   }
 
   .indi-item.active {
-    background-color: rgba(212,62,46,1.0);
+    background-color: rgba(212, 62, 46, 1);
   }
 </style>

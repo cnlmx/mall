@@ -1,13 +1,11 @@
 import axios from 'axios'
 
 export function request (config) {
-  // 创建实例
   const instance = axios.create({
     baseURL: 'http://123.207.32.32:8000',
     timeout: 5000
   })
 
-  // 拦截器
   instance.interceptors.request.use(
     config => {
       return config
@@ -18,13 +16,12 @@ export function request (config) {
   )
   instance.interceptors.response.use(
     res => {
-      return res
+      return res.data
     },
     err => {
-      console.lof(err)
+      console.log(err)
     }
   )
 
-  // 发送网络请求
   return instance(config)
 }
