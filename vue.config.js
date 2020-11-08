@@ -11,7 +11,7 @@ module.exports = {
         views: '@/views'
       }
     }
-  }
+  },
   // 别名设置方法二：
   // chainWebpack: config => {
   //   config.resolve.alias
@@ -22,4 +22,7 @@ module.exports = {
   //     .set('network', '@/network')
   //     .set('views', '@/views')
   // }
+
+  // 打包时去掉 map 文件，节省带宽
+  productionSourceMap: false
 }
