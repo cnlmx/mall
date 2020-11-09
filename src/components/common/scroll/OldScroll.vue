@@ -23,11 +23,12 @@ export default {
   },
   data () {
     return {
-      scroll: null
+      scroll: null,
+      message: '哈哈哈'
     }
   },
   mounted () {
-    // 1.创建 BScroll 对象
+    // 1.创建BScroll对象
     this.scroll = new BScroll(this.$refs.wrapper, {
       click: true,
       probeType: this.probeType,
@@ -35,7 +36,8 @@ export default {
     })
 
     // 2.监听滚动的位置
-    this.scroll.on('scroll', position => {
+    this.scroll.on('scroll', (position) => {
+      // console.log(position);
       this.$emit('scroll', position)
     })
 
@@ -45,8 +47,7 @@ export default {
     })
   },
   methods: {
-    // 封装一下以便 Home 组件里使用
-    scrollTo (x, y, time = 500) {
+    scrollTo (x, y, time = 300) {
       this.scroll.scrollTo(x, y, time)
     },
     finishPullUp () {
@@ -56,4 +57,6 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+
+</style>
