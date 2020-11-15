@@ -4,6 +4,13 @@
     <nav-bar class="home-nav">
       <template #center>购物街</template>
     </nav-bar>
+    <tab-control
+      :titles="['流行', '新款', '精选']"
+      @tab-click="tabClick"
+      ref="tabControl1"
+      class="tab-control"
+      v-show="isTabFixed"
+    />
 
     <scroll
       class="content"
@@ -14,18 +21,19 @@
       @pulling-up="loadMore"
     >
       <!-- 轮播图 -->
-      <home-swiper :banners="banners" />
+      <home-swiper :banners="banners" @swiper-image-load="swiperImageLoad" />
       <!-- 推荐信息 -->
       <home-recommend-view :recommends="recommends" />
       <!-- 本周流行 -->
       <home-feature-view />
-      <!-- 商品展示 -->
+      <!-- 标签控制 -->
       <tab-control
-        class="tab-control"
         :titles="['流行', '新款', '精选']"
         @tab-click="tabClick"
+        ref="tabControl2"
       />
-      <goods-list :goods="showGoods" />
+      <!-- 商品展示 -->
+      <goods-list :goodsList="showGoods" />
     </scroll>
 
     <!-- 回到顶部 -->
@@ -48,6 +56,7 @@ import BackTop from 'components/content/backTop/BackTop'
 
 // 方法
 import { getHomeMultidata, getHomeGoods } from 'network/home.js'
+import { debounce } from 'common/utils'
 
 export default {
   name: 'Home',
@@ -71,7 +80,10 @@ export default {
         sell: { page: 0, list: [] }
       },
       currentType: 'pop',
-      isShowBackTop: false
+      isShowBackTop: false,
+      tabOffsetTop: 0,
+      isTabFixed: false,
+      saveY: 0
     }
   },
   computed: {
@@ -88,29 +100,55 @@ export default {
     this.getHGoods('new')
     this.getHGoods('sell')
   },
+  mounted () {
+    // 监听 GoodListItem 中图片加载是否完成，并且增加防抖函数
+    const refresh = debounce(this.$refs.scroll.refresh)
+    this.$bus.$on('home-item-img-load', () => {
+      refresh()
+    })
+  },
+  // 活跃时: 回到之前记录的坐标，先重新计算一下高度
+  activated () {
+    this.$refs.scroll.refresh()
+    this.$refs.scroll.scrollTo(0, this.saveY, 0)
+  },
+  // 失活时: 记录当前滚动停留的坐标
+  deactivated () {
+    this.saveY = this.$refs.scroll.getScrollY()
+  },
   methods: {
     /**
-     * 事件监听相关的方法
-     */
+       * 事件监听相关的方法
+       */
     tabClick (index) {
       this.currentType = Object.keys(this.goods)[index]
+      this.$refs.tabControl1.currentIndex = index
+      this.$refs.tabControl2.currentIndex = index
     },
     backClick () {
+      // better-scroll 方法，滚动到某个位置（坐标）
       this.$refs.scroll.scrollTo(0, 0)
     },
     contentScroll (position) {
+      // 1.判断 BackTop 是否显示
       this.isShowBackTop = -position.y > 1000
+
+      // 2.决定 TabControl 是否吸顶（position: fixed）
+      this.isTabFixed = -position.y > this.tabOffsetTop
     },
     loadMore () {
       this.getHGoods(this.currentType)
     },
+    swiperImageLoad () {
+      this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop
+    },
     /**
-     * 网络请求相关的方法
-     */
+       * 网络请求相关的方法
+       */
     getHMdata () {
-      getHomeMultidata().then(({ data }) => {
-        this.banners = data.data.banner.list
-        this.recommends = data.data.recommend.list
+      getHomeMultidata().then(({ data: { data } }) => {
+        this.banners = data.banner.list
+        this.recommends = data.recommend.list
       })
     },
     getHGoods (type) {
@@ -119,6 +157,7 @@ export default {
         this.goods[type].list.push(...data.data.list)
         this.goods[type].page += 1
 
+        // better-scroll 使用该方法触发多次上拉加载事件
         this.$refs.scroll.finishPullUp()
       })
     }
@@ -129,24 +168,19 @@ export default {
 <style scoped>
   #home {
     position: relative;
-    padding-top: 44px;
     height: 100vh;
   }
 
   .home-nav {
-    position: fixed;
+    background-color: var(--color-tint);
+    color: #fff;
+
+    /* 在使用浏览器原生滚动时，为了让导航不跟随一起滚动 */
+    /* position: fixed;
     left: 0;
     right: 0;
     top: 0;
-    z-index: 7;
-    background-color: var(--color-tint);
-    color: #fff;
-  }
-
-  .tab-control {
-    position: sticky;
-    top: 44px;
-    z-index: 7;
+    z-index: 7; */
   }
 
   .content {
@@ -154,6 +188,11 @@ export default {
     top: 44px;
     bottom: 49px;
     overflow: hidden;
+  }
+
+  .tab-control {
+    position: relative;
+    z-index: 7;
   }
 
   /* .content {

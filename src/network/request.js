@@ -21,7 +21,7 @@ export function request (config) {
       return res
     },
     err => {
-      console.lof(err)
+      console.log(err)
     }
   )
 
