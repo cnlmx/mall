@@ -25,4 +25,13 @@ module.exports = {
 
   // 打包时去掉 map 文件，节省带宽
   productionSourceMap: false
+  // // 模拟本地数据
+  // devServer: {
+  //   port: 8080,
+  //   before (app) {
+  //     app.get('/api/index', (req, res) => {
+  //       res.json(mockIndexData)
+  //     })
+  //   }
+  // }
 }

@@ -50,7 +50,7 @@ export default {
   },
   methods: {
     /*
-    * 封装一下以便 Home 组件里使用
+    * 封装一下以便在其他组件中使用
     */
     scrollTo (x, y, time = 500) {
       this.scroll && this.scroll.scrollTo(x, y, time)

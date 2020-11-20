@@ -27,6 +27,7 @@ class GoodsInfo {
     this.desc = itemInfo.desc
     this.newPrice = itemInfo.price
     this.oldPrice = itemInfo.oldPrice
+    this.lowNowPrice = itemInfo.lowNowPrice
     this.realPrice = itemInfo.price
     this.discountDesc = itemInfo.discountDesc
     this.discountBg = itemInfo.discountBgColor

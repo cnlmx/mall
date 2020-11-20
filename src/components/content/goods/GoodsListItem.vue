@@ -1,10 +1,10 @@
 <template>
   <div class="goods-item" @click="itemClick">
-    <img :src="showImg" alt="" @load="imgLoad">
+    <img v-lazy="showImg" alt="" @load="imgLoad" />
     <div class="goods-info">
-      <p>{{goodsItem.title}}</p>
-      <span class="price">{{goodsItem.price}}</span>
-      <span class="collect">{{goodsItem.cfav}}</span>
+      <p>{{ goodsItem.title }}</p>
+      <span class="price">{{ goodsItem.price }}</span>
+      <span class="collect">{{ goodsItem.cfav }}</span>
       <span></span>
     </div>
   </div>
@@ -28,11 +28,7 @@ export default {
   },
   methods: {
     imgLoad () {
-      if (this.$route.path.includes('/home')) {
-        this.$bus.$emit('home-item-img-load')
-      } else if (this.$route.path.includes('/detail')) {
-        this.$bus.$emit('detail-item-img-load')
-      }
+      this.$bus.$emit('item-img-load')
     },
     itemClick () {
       this.$router.push('/detail/' + this.goodsItem.iid)
@@ -50,8 +46,13 @@ export default {
 
   .goods-item img {
     width: 100%;
-    /* height: 100%; */
     border-radius: 5px;
+  }
+
+  /* 懒加载图片大小 */
+  img[lazy='loading'] {
+    width: 25%;
+    margin-left: 25%;
   }
 
   .goods-info {
@@ -87,7 +88,7 @@ export default {
     top: -1px;
     width: 14px;
     height: 14px;
-    background-image: url("~assets/img/common/collect.svg");
+    background-image: url('~assets/img/common/collect.svg');
     background-size: 14px 14px;
   }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="Object.keys(detailInfo).length !== 0" class="goods-info">
+  <div v-if="Object.keys(detailInfo).length !== 0" class="image-info">
     <!-- 文字描述 -->
     <div class="info-desc clear-fix">
       <div></div>
@@ -25,7 +25,7 @@
 
 <script>
 export default {
-  name: 'DetailGoodsInfo',
+  name: 'DetailImageInfo',
   props: {
     detailInfo: {
       type: Object,
@@ -42,24 +42,14 @@ export default {
   },
   methods: {
     imgLoad () {
-      // 判断：当所有图片全部加载完成后，再发送事件
-      this.counter += 1
-      if (this.counter === this.imagesLength) {
-        this.$emit('image-load')
-      }
-    }
-  },
-  watch: {
-    // 获取图片数量
-    imgLen () {
-      this.imagesLength = this.detailInfo.detailImage[0].list.length
+      this.$emit('detail-image-load')
     }
   }
 }
 </script>
 
 <style scoped>
-  .goods-info {
+  .image-info {
     padding: 20px 0;
     border-bottom: 5px solid #f2f5f8;
   }

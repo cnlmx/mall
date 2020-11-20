@@ -2,7 +2,7 @@
   <div id="home">
     <!-- 导航 -->
     <nav-bar class="home-nav">
-      <template #center>购物街</template>
+      <template #center>商城</template>
     </nav-bar>
     <tab-control
       :titles="['流行', '新款', '精选']"
@@ -52,11 +52,10 @@ import NavBar from 'components/common/navbar/NavBar'
 import TabControl from 'components/content/tabControl/TabControl'
 import GoodsList from 'components/content/goods/GoodsList'
 import Scroll from 'components/common/scroll/Scroll'
-import BackTop from 'components/content/backTop/BackTop'
 
 // 方法
 import { getHomeMultidata, getHomeGoods } from 'network/home.js'
-import { debounce } from 'common/utils'
+import { itemListenerMixin, backTopMixin } from 'common/mixin.js'
 
 export default {
   name: 'Home',
@@ -67,8 +66,7 @@ export default {
     NavBar,
     TabControl,
     GoodsList,
-    Scroll,
-    BackTop
+    Scroll
   },
   data () {
     return {
@@ -80,12 +78,16 @@ export default {
         sell: { page: 0, list: [] }
       },
       currentType: 'pop',
-      isShowBackTop: false,
       tabOffsetTop: 0,
       isTabFixed: false,
       saveY: 0
     }
   },
+  /*
+     * 监听 GoodListItem 中图片加载是否完成，并且增加防抖函数
+     * BackTop 滚动回顶点
+     */
+  mixins: [itemListenerMixin, backTopMixin],
   computed: {
     showGoods () {
       return this.goods[this.currentType].list
@@ -100,13 +102,6 @@ export default {
     this.getHGoods('new')
     this.getHGoods('sell')
   },
-  mounted () {
-    // 监听 GoodListItem 中图片加载是否完成，并且增加防抖函数
-    const refresh = debounce(this.$refs.scroll.refresh)
-    this.$bus.$on('home-item-img-load', () => {
-      refresh()
-    })
-  },
   // 活跃时: 回到之前记录的坐标，先重新计算一下高度
   activated () {
     this.$refs.scroll.refresh()
@@ -114,20 +109,21 @@ export default {
   },
   // 失活时: 记录当前滚动停留的坐标
   deactivated () {
+    // 1.保存 Y 值
     this.saveY = this.$refs.scroll.getScrollY()
+
+    // 2.取消全局事件的监听
+    this.$bus.$off('item-img-load', this.itemImgListener)
   },
   methods: {
     /**
        * 事件监听相关的方法
        */
     tabClick (index) {
+      // 获取当前点击的 index
       this.currentType = Object.keys(this.goods)[index]
       this.$refs.tabControl1.currentIndex = index
       this.$refs.tabControl2.currentIndex = index
-    },
-    backClick () {
-      // better-scroll 方法，滚动到某个位置（坐标）
-      this.$refs.scroll.scrollTo(0, 0)
     },
     contentScroll (position) {
       // 1.判断 BackTop 是否显示
